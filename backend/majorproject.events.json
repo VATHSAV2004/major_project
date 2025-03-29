@@ -1,0 +1,441 @@
+[{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e44"
+  },
+  "name": "Event 0",
+  "description": "Description for Event 0.",
+  "date": {
+    "$date": "2025-04-10T00:00:00.000Z"
+  },
+  "startTime": "10:00",
+  "endTime": "14:00",
+  "venue": "Venue 0",
+  "club": "Club 0",
+  "department": "CSE",
+  "status": "ONGOING",
+  "posterUrl": "https://example.com/event0.jpg",
+  "managers": [],
+  "volunteers": []
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e45"
+  },
+  "name": "Event 1",
+  "description": "Description for Event 1.",
+  "date": {
+    "$date": "2025-04-11T00:00:00.000Z"
+  },
+  "startTime": "11:00",
+  "endTime": "15:00",
+  "venue": "Venue 1",
+  "club": "Club 1",
+  "department": "AIML",
+  "status": "NOT YET STARTED",
+  "posterUrl": "https://example.com/event1.jpg",
+  "managers": [
+    {
+      "$oid": "67e2669b7182d69d32fb6e63"
+    },
+    {
+      "$oid": "67e2669b7182d69d32fb6e5d"
+    },
+    {
+      "$oid": "67e2669b7182d69d32fb6e5d"
+    }
+  ],
+  "volunteers": [
+    {
+      "$oid": "660d1f07a3f1e72d7c1bdf10"
+    },
+    {
+      "$oid": "67e2669b7182d69d32fb6e5b"
+    },
+    {
+      "$oid": "67e2669b7182d69d32fb6e5e"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e46"
+  },
+  "name": "Event 2",
+  "description": "Description for Event 2.",
+  "date": {
+    "$date": "2025-04-12T00:00:00.000Z"
+  },
+  "startTime": "12:00",
+  "endTime": "16:00",
+  "venue": "Venue 2",
+  "club": "Club 2",
+  "department": "MECH",
+  "status": "COMPLETED",
+  "posterUrl": "https://example.com/event2.jpg",
+  "managers": [
+    {
+      "$oid": "67e2669b7182d69d32fb6e5d"
+    },
+    {
+      "$oid": "67e2669b7182d69d32fb6e60"
+    }
+  ],
+  "volunteers": []
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e47"
+  },
+  "name": "Event 3",
+  "description": "Description for Event 3.",
+  "date": "2025-04-13",
+  "startTime": "13:00 AM",
+  "endTime": "5:00 PM",
+  "venue": "Venue 3",
+  "club": "Club 3",
+  "department": "EEE",
+  "status": "ONGOING",
+  "posterUrl": "https://example.com/event3.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf11"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf12"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e48"
+  },
+  "name": "Event 4",
+  "description": "Description for Event 4.",
+  "date": "2025-04-14",
+  "startTime": "14:00 AM",
+  "endTime": "6:00 PM",
+  "venue": "Venue 4",
+  "club": "Club 4",
+  "department": "ECE",
+  "status": "NOT YET STARTED",
+  "posterUrl": "https://example.com/event4.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf12"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf13"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e49"
+  },
+  "name": "Event 5",
+  "description": "Description for Event 5.",
+  "date": "2025-04-15",
+  "startTime": "15:00 AM",
+  "endTime": "7:00 PM",
+  "venue": "Venue 5",
+  "club": "Club 0",
+  "department": "CSE",
+  "status": "COMPLETED",
+  "posterUrl": "https://example.com/event5.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf13"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf14"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e4a"
+  },
+  "name": "Event 6",
+  "description": "Description for Event 6.",
+  "date": "2025-04-16",
+  "startTime": "16:00 AM",
+  "endTime": "8:00 PM",
+  "venue": "Venue 6",
+  "club": "Club 1",
+  "department": "AIML",
+  "status": "ONGOING",
+  "posterUrl": "https://example.com/event6.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf14"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf15"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e4b"
+  },
+  "name": "Event 7",
+  "description": "Description for Event 7.",
+  "date": "2025-04-17",
+  "startTime": "17:00 AM",
+  "endTime": "9:00 PM",
+  "venue": "Venue 7",
+  "club": "Club 2",
+  "department": "MECH",
+  "status": "NOT YET STARTED",
+  "posterUrl": "https://example.com/event7.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf15"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf16"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e4c"
+  },
+  "name": "Event 8",
+  "description": "Description for Event 8.",
+  "date": "2025-04-18",
+  "startTime": "18:00 AM",
+  "endTime": "10:00 PM",
+  "venue": "Venue 8",
+  "club": "Club 3",
+  "department": "EEE",
+  "status": "COMPLETED",
+  "posterUrl": "https://example.com/event8.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf16"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf17"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e4d"
+  },
+  "name": "Event 9",
+  "description": "Description for Event 9.",
+  "date": "2025-04-19",
+  "startTime": "19:00 AM",
+  "endTime": "11:00 PM",
+  "venue": "Venue 9",
+  "club": "Club 4",
+  "department": "ECE",
+  "status": "ONGOING",
+  "posterUrl": "https://example.com/event9.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf17"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf18"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e4e"
+  },
+  "name": "Event 10",
+  "description": "Description for Event 10.",
+  "date": "2025-04-20",
+  "startTime": "20:00 AM",
+  "endTime": "12:00 PM",
+  "venue": "Venue 10",
+  "club": "Club 0",
+  "department": "CSE",
+  "status": "NOT YET STARTED",
+  "posterUrl": "https://example.com/event10.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf18"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf19"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e4f"
+  },
+  "name": "Event 11",
+  "description": "Description for Event 11.",
+  "date": "2025-04-21",
+  "startTime": "21:00 AM",
+  "endTime": "13:00 PM",
+  "venue": "Venue 11",
+  "club": "Club 1",
+  "department": "AIML",
+  "status": "COMPLETED",
+  "posterUrl": "https://example.com/event11.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf19"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf20"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e50"
+  },
+  "name": "Event 12",
+  "description": "Description for Event 12.",
+  "date": "2025-04-22",
+  "startTime": "10:00 AM",
+  "endTime": "2:00 PM",
+  "venue": "Venue 12",
+  "club": "Club 2",
+  "department": "MECH",
+  "status": "ONGOING",
+  "posterUrl": "https://example.com/event12.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf20"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf21"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e51"
+  },
+  "name": "Event 13",
+  "description": "Description for Event 13.",
+  "date": "2025-04-23",
+  "startTime": "11:00 AM",
+  "endTime": "3:00 PM",
+  "venue": "Venue 13",
+  "club": "Club 3",
+  "department": "EEE",
+  "status": "NOT YET STARTED",
+  "posterUrl": "https://example.com/event13.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf21"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf22"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e52"
+  },
+  "name": "Event 14",
+  "description": "Description for Event 14.",
+  "date": "2025-04-24",
+  "startTime": "12:00 AM",
+  "endTime": "4:00 PM",
+  "venue": "Venue 14",
+  "club": "Club 4",
+  "department": "ECE",
+  "status": "COMPLETED",
+  "posterUrl": "https://example.com/event14.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf22"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf23"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e53"
+  },
+  "name": "Event 15",
+  "description": "Description for Event 15.",
+  "date": "2025-04-25",
+  "startTime": "13:00 AM",
+  "endTime": "5:00 PM",
+  "venue": "Venue 15",
+  "club": "Club 0",
+  "department": "CSE",
+  "status": "ONGOING",
+  "posterUrl": "https://example.com/event15.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf23"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf24"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e54"
+  },
+  "name": "Event 16",
+  "description": "Description for Event 16.",
+  "date": "2025-04-26",
+  "startTime": "14:00 AM",
+  "endTime": "6:00 PM",
+  "venue": "Venue 16",
+  "club": "Club 1",
+  "department": "AIML",
+  "status": "NOT YET STARTED",
+  "posterUrl": "https://example.com/event16.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf24"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf25"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e55"
+  },
+  "name": "Event 17",
+  "description": "Description for Event 17.",
+  "date": "2025-04-27",
+  "startTime": "15:00 AM",
+  "endTime": "7:00 PM",
+  "venue": "Venue 17",
+  "club": "Club 2",
+  "department": "MECH",
+  "status": "COMPLETED",
+  "posterUrl": "https://example.com/event17.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf25"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf26"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e56"
+  },
+  "name": "Event 18",
+  "description": "Description for Event 18.",
+  "date": "2025-04-28",
+  "startTime": "16:00 AM",
+  "endTime": "8:00 PM",
+  "venue": "Venue 18",
+  "club": "Club 3",
+  "department": "EEE",
+  "status": "ONGOING",
+  "posterUrl": "https://example.com/event18.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf26"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf27"
+  ]
+},
+{
+  "_id": {
+    "$oid": "67e260377182d69d32fb6e57"
+  },
+  "name": "Event 19",
+  "description": "Description for Event 19.",
+  "date": "2025-04-29",
+  "startTime": "17:00 AM",
+  "endTime": "9:00 PM",
+  "venue": "Venue 19",
+  "club": "Club 4",
+  "department": "ECE",
+  "status": "NOT YET STARTED",
+  "posterUrl": "https://example.com/event19.jpg",
+  "managers": [
+    "660d1f07a3f1e72d7c1bdf27"
+  ],
+  "volunteers": [
+    "660d1f07a3f1e72d7c1bdf28"
+  ]
+}]
