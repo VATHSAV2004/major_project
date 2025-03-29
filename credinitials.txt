@@ -1,0 +1,15 @@
+✅ Admin Accounts
+Email	Password	Role
+admin1@example.com	password123	admin
+admin2@example.com	password123	admin
+admin3@example.com	password123	admin
+✅ Manager Accounts
+Email	Password	Role
+manager1@example.com	password123	manager
+manager2@example.com	password123	manager
+manager3@example.com	password123	manager
+✅ Volunteer Accounts
+Email	Password	Role
+volunteer1@example.com	password123	volunteer
+volunteer2@example.com	password123	volunteer
+volunteer3@example.com	password123	volunteer
