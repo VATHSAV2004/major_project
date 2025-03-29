@@ -1,0 +1,24 @@
+.departmentname{
+    color:#ffffff
+
+    ;
+    padding: 10px;
+    font-weight: bold;
+}
+.mainback{
+    background-color:black ;
+}
+
+.view-more {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    display: block;
+    margin-top: 8px;
+  }
+  
+  .view-more:hover {
+    text-decoration: underline;
+  }
+  
