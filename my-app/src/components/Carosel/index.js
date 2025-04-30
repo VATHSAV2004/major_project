@@ -67,7 +67,12 @@ export default function SliderComponent({ events = [] }) {
         {events.map((event) => (
           <div key={event._id}>
             <EventCard
-              image={event.posterUrl}
+              eventId={event._id}
+              image={
+                event.poster && event.posterContentType
+                  ? `data:${event.posterContentType};base64,${event.poster}`
+                  : "https://via.placeholder.com/300x200?text=No+Image" // fallback if no poster
+              }
               name={event.name}
               description={event.description}
             />

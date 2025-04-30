@@ -1,10 +1,12 @@
 ###
-GET http://localhost:3001/
+GET http://localhost:3001/api/events
 
+###
+GET https://major-project-backend-4kbj.onrender.com/api/events
 
 ###
 
-POST http://localhost:3001/add-event
+POST http://localhost:3001/events
 Content-Type: application/json
 
 {

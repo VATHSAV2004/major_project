@@ -8,20 +8,15 @@ import Home from './components/Home';
 import CategoryPage from "./components/CategoryPage";
 import AllManagers from './components/AllManagers';
 import Header from './components/Header';
-
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import Footer from './components/Footer'; 
 import EditEvent from './components/EditEvent';
+import EventDetails from "./components/EventDetails";
+import Approval from "./components/Approval";     // Adjust path as needed
+import UserDashboard from "./components/UserDashboard"
+import AllRegisteredEvents from './components/AllRegisteredEvents';
+import About from './components/About';
 
-const ProtectedRoute = ({ element, allowedRoles }) => {
-  const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('role');
-
-  if (!token || !allowedRoles.includes(userRole)) {
-    return <Navigate to="/login" />;
-  }
-
-  return element;
-};
 
 function App() {
   return (
@@ -46,9 +41,20 @@ function App() {
           path="/volunteer-dashboard" 
           element={<ProtectedRoute element={<VolunteerDashboard />} allowedRoles={['volunteer']} />} 
         />
+        <Route 
+          path="/user-dashboard" 
+          element={<ProtectedRoute element={<UserDashboard />} allowedRoles={['user']} />} 
+        />
         <Route path="/events/:categoryId" element={<CategoryPage />} />
+        <Route path="/event/:id" element={<EventDetails />} />
 
         <Route path="/edit-event/:id" element={<EditEvent />} />
+
+        <Route path="/approval/:eventId" element={<Approval />} />
+
+        <Route path="/user-dashboard" element={<UserDashboard />} />
+        <Route path="/all-registered-events" element={<AllRegisteredEvents />} />
+        <Route path="/about" element={<About />} />
 
         <Route path="*" element={<Navigate to="/" />} />
 

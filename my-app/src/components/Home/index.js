@@ -4,14 +4,14 @@ import SliderComponent from '../Carosel';
 import "./index.css";
 
 const Home = () => {
-  const [eventsByCategory, setEventsByCategory] = useState([]);
+  const [eventsByClub, setEventsByClub] = useState([]);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('http://localhost:3001/events-by-category');
+        const response = await fetch('http://localhost:3001/events-by-club'); // updated URL
         const data = await response.json();
-        setEventsByCategory(data);
+        setEventsByClub(data);
       } catch (error) {
         console.error("Failed to fetch events:", error);
       }
@@ -21,23 +21,19 @@ const Home = () => {
   }, []);
 
   return (
-    <>
-      <div className="mainback">
-        {eventsByCategory.map((category) => (
-          <div key={category._id}>
-            <h3 className="departmentname">{category._id} Events</h3>
-            {/* Display only 7 events */}
-            <SliderComponent events={category.events.slice(0, 7)} />
-            {/* Always show "View More" button if events exist */}
-            {category.events?.length && (
-              <Link to={`/events/${category._id}`} className="view-more">
-                View More
-              </Link>
-            )}
-          </div>
-        ))}
-      </div>
-    </>
+    <div className="mainback">
+      {eventsByClub.map((club) => (
+        <div key={club._id}>
+          <h3 className="departmentname">{club._id} Events</h3>
+          <SliderComponent events={club.events.slice(0, 7)} />
+          {club.events?.length > 0 && (
+            <Link to={`/events/${club._id}`} className="view-more">
+              View More
+            </Link>
+          )}
+        </div>
+      ))}
+    </div>
   );
 };
 

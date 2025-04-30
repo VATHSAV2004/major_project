@@ -14,15 +14,11 @@ const EditEvent = () => {
   const [volunteerSearchResults, setVolunteerSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ Fixed Time Conversion (Handles both 12-hour and 24-hour formats)
   const convertTo24HourFormat = (time) => {
     if (!time) return '';
-    // If it's already in 24-hour format, return as is
     if (/^\d{2}:\d{2}$/.test(time)) return time;
-    
     const match = time.match(/(\d+):(\d+) (\w+)/);
     if (!match) return time;
-
     const [hour, minute, period] = match.slice(1);
     return `${period === 'PM' && hour !== '12' ? +hour + 12 : hour}:${minute}`;
   };
@@ -32,8 +28,6 @@ const EditEvent = () => {
       setLoading(true);
       try {
         const res = await axios.get(`http://localhost:3001/api/events/${id}`);
-        console.log('Fetched event data:', res.data);
-
         setEvent({
           ...res.data,
           date: res.data.date ? new Date(res.data.date).toISOString().split('T')[0] : '',
@@ -87,6 +81,32 @@ const EditEvent = () => {
     }
   };
 
+  const uploadPoster = async (file) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('poster', file);
+
+    try {
+      const res = await axios.post('http://localhost:3001/api/upload-poster', formData);
+      setEvent((prev) => ({ ...prev, posterFileId: res.data.fileId }));
+      alert('Poster uploaded successfully!');
+    } catch (err) {
+      console.error('Poster upload failed:', err);
+      alert('Poster upload failed.');
+    }
+  };
+
+  const removePoster = async () => {
+    try {
+      await axios.delete(`http://localhost:3001/api/remove-poster/${event.posterFileId}`);
+      setEvent((prev) => ({ ...prev, posterFileId: null }));
+      alert('Poster removed successfully!');
+    } catch (err) {
+      console.error('Failed to remove poster:', err);
+      alert('Failed to remove poster.');
+    }
+  };
+
   const removeManager = (id) => {
     setManagers(managers.filter((m) => m._id !== id));
   };
@@ -113,7 +133,7 @@ const EditEvent = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="loading">Loading...</div>;
 
   return (
     <div className="edit-event">
@@ -127,11 +147,23 @@ const EditEvent = () => {
       <input name="club" value={event.club || ''} onChange={handleChange} placeholder="Club" />
       <input name="department" value={event.department || ''} onChange={handleChange} placeholder="Department" />
       <input name="status" value={event.status || ''} onChange={handleChange} placeholder="Status" />
-      <input name="posterUrl" value={event.posterUrl || ''} onChange={handleChange} placeholder="Poster URL" />
+      
+      <h3>Poster</h3>
+      {event.posterFileId ? (
+        <div>
+          <img
+            src={`http://localhost:3001/api/poster/${event.posterFileId}`}
+            alt="Poster Preview"
+            style={{ width: '200px', marginTop: '10px' }}
+          />
+          <button onClick={removePoster}>Remove Poster</button>
+        </div>
+      ) : (
+        <input type="file" name="poster" accept="image/*" onChange={(e) => uploadPoster(e.target.files[0])} />
+      )}
 
-      {/* ✅ Managers Section */}
       <h3>Managers</h3>
-      <div className="box">
+      <div className="tag-container">
         {managers.length > 0 ? (
           managers.map((m) => (
             <div key={m._id} className="tag">
@@ -144,16 +176,17 @@ const EditEvent = () => {
         )}
       </div>
       <input type="text" placeholder="Search Managers" onChange={(e) => searchManagers(e.target.value)} />
-      {managerSearchResults.map((user) => (
-        <div key={user._id} className="result">
-          {user.name}
-          <button onClick={() => addManager(user)}>+</button>
-        </div>
-      ))}
+      <div className="search-results">
+        {managerSearchResults.map((user) => (
+          <div key={user._id} className="result">
+            {user.name}
+            <button onClick={() => addManager(user)}>+</button>
+          </div>
+        ))}
+      </div>
 
-      {/* ✅ Volunteers Section */}
       <h3>Volunteers</h3>
-      <div className="box">
+      <div className="tag-container">
         {volunteers.length > 0 ? (
           volunteers.map((v) => (
             <div key={v._id} className="tag">
@@ -166,15 +199,16 @@ const EditEvent = () => {
         )}
       </div>
       <input type="text" placeholder="Search Volunteers" onChange={(e) => searchVolunteers(e.target.value)} />
-      {volunteerSearchResults.map((user) => (
-        <div key={user._id} className="result">
-          {user.name}
-          <button onClick={() => addVolunteer(user)}>+</button>
-        </div>
-      ))}
+      <div className="search-results">
+        {volunteerSearchResults.map((user) => (
+          <div key={user._id} className="result">
+            {user.name}
+            <button onClick={() => addVolunteer(user)}>+</button>
+          </div>
+        ))}
+      </div>
 
-      {/* ✅ Save Button */}
-      <button onClick={handleSave} disabled={loading}>Save</button>
+      <button className="save-btn" onClick={handleSave} disabled={loading}>Save</button>
     </div>
   );
 };

@@ -1,59 +1,93 @@
-.navelements {
-    color: #ffffff !important;
-    font-weight: bold;
-}
-
-.brand {
-    color: #ffffff !important;
-    font-weight: bold;
-    padding: 7px;
-    font-family: 'Brush Script MT';
-    font-size: 30px !important;
-}
-
-.navbar.navcontainer {
-    background-color: black !important;
-    box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.8);
-}
-
-.nav-actions {
+.header-container {
+    background-color: black;
+    width: 100%;
+    padding: 10px 12px;
     display: flex;
     align-items: center;
-    margin-left: 10px;
-}
-
-.login-button {
-    background-color: #0000FF !important;
-    color: white !important;
+    justify-content: space-between;
+  }
+  
+  .nav_logo {
+    padding: 0 12px;
+  }
+  
+  .nav-logo-link {
+    text-decoration: none;
+    font-size: 24px;
+    color: white;
     font-weight: bold;
-    padding: 5px 15px;
+  }
+  
+  .menuToggleBtn {
+    display: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .nav-menu {
+    list-style: none;
+    display: flex;
+  }
+  
+  .nav-menu li:hover {
+    cursor: pointer;
+    background: #333;
+    border-radius: 4px;
+  }
+  
+  .nav-menu-list {
+    text-decoration: none;
+    color: white;
+    display: block;
+    padding: 10px 10px;
+  }
+  
+  .login-button {
+    background-color: #1e88e5;
+    padding: 6px 12px;
+    border-radius: 5px;
+  }
+  
+  .logout-button {
+    background-color: #d32f2f;
+    padding: 6px 12px;
     border-radius: 5px;
     border: none;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.user-icon {
     color: white;
-    font-size: 28px;
-    margin-left: 10px;
     cursor: pointer;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .nav-actions {
-        margin-top: 10px;
-        justify-content: center;
-        gap: 8px;
+  }
+  
+  .logout-button:hover {
+    background-color: #b71c1c;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .header-container {
+      flex-direction: column;
+      align-items: flex-start;
     }
-
-    .login-button {
-        font-size: 14px;
-        padding: 5px 12px;
+  
+    .menuToggleBtn {
+      display: block;
     }
-
-    .user-icon {
-        font-size: 24px;
-        margin-left: 0;
+  
+    .nav-menu {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      margin-top: 5px;
     }
+  
+    .nav-menu.open {
+      display: flex;
+    }
+  }
+  /* Highlight active dashboard link */
+.active-dashboard-link {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
+  color: #ff9800; /* Highlight color */
+  font-weight: bold;
 }

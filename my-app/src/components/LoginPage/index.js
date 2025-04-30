@@ -25,8 +25,10 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // Save token, role, and userId in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('role', data.role);
+        localStorage.setItem('userId', data.userId);  // Store userId
 
         if (data.role === 'admin') navigate('/admin-dashboard');
         else if (data.role === 'manager') navigate('/manager-dashboard');
@@ -41,46 +43,43 @@ const LoginPage = () => {
   };
 
   return (
-    <>
+    <div className="login-container">
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-      <div className="login-container">
-        <h2>Login</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+        {/* Dropdown for role selection */}
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          required
+        >
+          <option value="user">User</option>  
+          <option value="admin">Admin</option>
+          <option value="manager">Manager</option>
+          <option value="volunteer">Volunteer</option>
+        </select>
 
-          {/* Dropdown for role selection */}
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            required
-          >
-            <option value="user">User</option>  
-            <option value="admin">Admin</option>
-            <option value="manager">Manager</option>
-            <option value="volunteer">Volunteer</option>
-          </select>
-
-          <button type="submit">Login</button>
-          {error && <p className="error">{error}</p>}
-        </form>
-        <p className="signup-link">
-          Don't have an account? <a href="/signup">Sign up here</a>
-        </p>
-      </div>
-    </>
+        <button type="submit">Login</button>
+        {error && <p className="error">{error}</p>}
+      </form>
+      <p className="signup-link">
+        Don't have an account? <a href="/signup">Sign up here</a>
+      </p>
+    </div>
   );
 };
 

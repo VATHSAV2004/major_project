@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaCheckCircle } from "react-icons/fa"; // Make sure FaCheckCircle is imported
 import axios from "axios";
-import "./index.css";
+import "./index.css"; // Make sure you have styles for these icons
 
 const EventsList = ({ userRole }) => {
   const [events, setEvents] = useState([]);
@@ -33,6 +33,11 @@ const EventsList = ({ userRole }) => {
 
   const handleEdit = (event) => {
     navigate(`/edit-event/${event._id}`, { state: { event } });
+  };
+
+  // New function to handle click on the approval symbol
+  const handleApprovalClick = (eventId) => {
+    navigate(`/approval/${eventId}`);
   };
 
   return (
@@ -66,13 +71,32 @@ const EventsList = ({ userRole }) => {
 
             {(userRole === "admin" || userRole === "manager") && (
               <div className="event-actions">
+                {/* Add Approval Symbol */}
+                <FaCheckCircle
+                  className="approval-icon"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent event card click
+                    handleApprovalClick(event._id);
+                  }}
+                  style={{ cursor: "pointer", fontSize: "24px", color: "green" }} // Ensure visibility
+                />
+
+                {/* Edit and Delete Icons */}
                 <FaEdit
                   className="edit-icon"
-                  onClick={() => handleEdit(event)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent event card click
+                    handleEdit(event);
+                  }}
+                  style={{ cursor: "pointer", fontSize: "20px" }}
                 />
                 <FaTrash
                   className="delete-icon"
-                  onClick={() => handleDelete(event._id)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent event card click
+                    handleDelete(event._id);
+                  }}
+                  style={{ cursor: "pointer", fontSize: "20px" }}
                 />
               </div>
             )}

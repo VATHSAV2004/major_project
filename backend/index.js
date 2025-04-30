@@ -3,13 +3,16 @@ import express from "express";
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { GridFSBucket } from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 import User from "./models/users.js";
 import Event from "./models/events.js";
+import Registration from './models/registrations.js';
 
 const app = express();
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000','https://eveosmania.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true 
 }));
@@ -19,10 +22,19 @@ const mongoose_url = "mongodb://localhost:27017/majorproject";
 
 const JWT_SECRET = "your_jwt_secret"; // Keep it secure
 
+// Initialize GridFS bucket
+let gfsBucket;
+
 const initializeDb = async () => {
   try {
     await mongoose.connect(mongoose_url);
     console.log("MongoDB connected");
+    
+    // Initialize GridFS bucket after connection
+    const conn = mongoose.connection;
+    gfsBucket = new GridFSBucket(conn.db, {
+      bucketName: 'posters'
+    });
   } catch (e) {
     console.log(e);
   }
@@ -30,6 +42,36 @@ const initializeDb = async () => {
 
 initializeDb();
 
+
+
+
+
+
+app.get('/api/poster/:id', async (req, res) => {
+  try {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: "Invalid file ID" });
+    }
+    
+    const fileId = new ObjectId(req.params.id);
+    const files = await mongoose.connection.db.collection('posters.files').find({ _id: fileId }).toArray();
+    
+    if (!files || files.length === 0) {
+      return res.status(404).json({ message: "File not found" });
+    }
+    
+    const readStream = gfsBucket.openDownloadStream(fileId);
+    res.set('Content-Type', files[0].contentType);
+    readStream.pipe(res);
+    
+    readStream.on('error', (err) => {
+      res.status(500).json({ message: "Error streaming file" });
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to retrieve poster" });
+  }
+});
 // -------------------- Middleware to Authenticate User Role --------------------
 const authenticateRole = (allowedRoles) => (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -55,6 +97,7 @@ const authenticateRole = (allowedRoles) => (req, res, next) => {
   }
 };
 
+// -------------------- Login Route --------------------
 // -------------------- Login Route --------------------
 app.post('/login', async (req, res) => {
   const { email, password, role } = req.body;
@@ -83,18 +126,21 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Role mismatch' });
     }
 
+    // Generate JWT token
     const token = jwt.sign(
       { id: user._id, role: user.role },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    res.status(200).json({ token, role: user.role });
+    // Send the token, role, and userId in the response
+    res.status(200).json({ token, role: user.role, userId: user._id });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Error logging in' });
   }
 });
+
 
 
 
@@ -135,17 +181,49 @@ app.get('/events', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch events' });
   }
 });
+//home page apis
+//home page api for clubs based view
 
-app.get('/events-by-category', async (req, res) => {
+app.get('/events-by-club', async (req, res) => {
   try {
-    const eventsByCategory = await Event.aggregate([
-      { $group: { _id: '$department', events: { $push: '$$ROOT' } } }
+    const eventsByClub = await Event.aggregate([
+      {
+        $group: {
+          _id: '$club',             // Grouping by club instead of department
+          events: { $push: '$$ROOT' }
+        }
+      },
+      {
+        $sort: { _id: 1 }           // Optional: sorts clubs alphabetically
+      }
     ]);
-    res.status(200).json(eventsByCategory);
+    
+    res.status(200).json(eventsByClub);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
+//likes api
+app.post('/events/:id/like', async (req, res) => {
+  const { userId } = req.body;
+  const eventId = req.params.id;
+
+  try {
+    const event = await Event.findById(eventId);
+
+    if (!event.likes.includes(userId)) {
+      event.likes.push(userId);
+      await event.save();
+      res.status(200).json({ message: "Liked!" });
+    } else {
+      res.status(400).json({ message: "Already liked." });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 app.get('/events/:categoryId', async (req, res) => {
   const { categoryId } = req.params;
@@ -391,16 +469,24 @@ app.put("/api/events/:id", async (req, res) => {
 
 app.get("/api/events/:id", async (req, res) => {
   try {
-    const event = await Event.findById(req.params.id);
+    const event = await Event.findById(req.params.id)
+      .populate('managers', 'name')
+      .populate('volunteers', 'name')
+      .populate('registeredUserIds', 'name');
+
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
     }
+
+    console.log(event);  // Log the event to see the populated managers
     res.json(event);
   } catch (err) {
     console.error("Error fetching event:", err);
     res.status(500).json({ message: "Server Error" });
   }
 });
+
+
 
 app.get('/api/users/managers', async (req, res) => {
   try {
@@ -433,6 +519,180 @@ app.get('/api/users/volunteers', async (req, res) => {
   }
 });
 
+
+// Verify Token Route
+app.get("/auth/verify", (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    return res.json({ role: decoded.role });
+  });
+});
+
+
+
+// -------------------- Registration Routes --------------------
+
+// Check registration status
+app.get("/api/registration/status/:eventId/:userId", async (req, res) => {
+  const { eventId, userId } = req.params;
+
+  try {
+    const reg = await Registration.findOne({ eventId, userId });
+
+    if (!reg) return res.json({ status: "not-registered" });
+    if (reg.approved) return res.json({ status: "approved" });
+
+    return res.json({ status: "registered" });
+  } catch (err) {
+    console.error("Error checking registration status", err);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+});
+
+// Register with screenshot (base64)
+app.post("/api/registration/register", async (req, res) => {
+  try {
+    const { eventId, userId, screenshot, contentType } = req.body;
+
+    if (!screenshot || !contentType) {
+      return res.status(400).json({ msg: "Screenshot and contentType are required" });
+    }
+
+    const already = await Registration.findOne({ eventId, userId });
+    if (already) return res.status(400).json({ msg: "Already registered" });
+
+    const registration = new Registration({
+      eventId,
+      userId,
+      screenshot,       // storing base64 image directly
+      contentType,      // storing content type (like image/png)
+      approved: false
+    });
+
+    await registration.save();
+
+    res.json({ msg: "Registered successfully" });
+  } catch (err) {
+    console.error("Registration error:", err);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+});
+
+// (Optional) Approve a registration
+app.put("/api/registration/approve/:id", authenticateRole(['admin', 'manager']), async (req, res) => {
+  try {
+    const registration = await Registration.findByIdAndUpdate(
+      req.params.id,
+      { approved: true },
+      { new: true }
+    );
+
+    if (!registration) {
+      return res.status(404).json({ msg: "Registration not found" });
+    }
+
+    res.json({ msg: "Registration approved", registration });
+  } catch (err) {
+    console.error("Approval error:", err);
+    res.status(500).json({ msg: "Internal server error" });
+  }
+});
+
+//-----------------------editevent apis
+
+//------------------------registration approval apis
+
+// Fetch all registrations for a specific event
+app.get('/api/registrations/:eventId', async (req, res) => {
+  try {
+    const registrations = await Registration.find({ eventId: req.params.eventId })
+      .populate('userId', 'name email')  // Populate user info like name and email
+      .exec();
+    res.json(registrations);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch registrations" });
+  }
+});
+
+// Update the approval status of a registration
+app.put('/api/registration/approve/:registrationId', async (req, res) => {
+  try {
+    const registration = await Registration.findByIdAndUpdate(
+      req.params.registrationId,
+      { approved: true },
+      { new: true }
+    );
+    res.json(registration);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to approve registration" });
+  }
+});
+
+app.delete('/api/registration/:registrationId', async (req, res) => {
+  try {
+    const registration = await Registration.findByIdAndDelete(req.params.registrationId);
+    if (!registration) {
+      return res.status(404).json({ message: "Registration not found" });
+    }
+    res.json({ message: "Registration removed successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to remove registration" });
+  }
+});
+
+//-----------user dashboard apis
+app.get('/api/registered-events/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Fetch first 5 registrations for the user
+    const registrations = await Registration.find({ userId })
+      .populate('eventId', 'name status')  // Populate event details (name, status)
+      .limit(5);
+
+    const events = registrations.map(reg => ({
+      name: reg.eventId.name,
+      status: reg.approved ? 'Approved' : 'Not Approved',
+      eventId: reg.eventId._id
+    }));
+
+    res.status(200).json(events);
+  } catch (error) {
+    console.error('Error fetching registered events:', error);
+    res.status(500).json({ error: 'Failed to fetch registered events' });
+  }
+});
+
+// GET endpoint to fetch all registered events for a user
+app.get('/api/all-registered-events/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Fetch all registrations for the user
+    const registrations = await Registration.find({ userId })
+      .populate('eventId', 'name status')  // Populate event details (name, status)
+      .exec();
+
+    const events = registrations.map(reg => ({
+      name: reg.eventId.name,
+      status: reg.approved ? 'Approved' : 'Not Approved',
+      eventId: reg.eventId._id
+    }));
+
+    res.status(200).json(events);
+  } catch (error) {
+    console.error('Error fetching all registered events:', error);
+    res.status(500).json({ error: 'Failed to fetch all registered events' });
+  }
+});
 
 
 app.listen(3001, () => {
