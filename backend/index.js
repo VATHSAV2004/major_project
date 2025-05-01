@@ -466,76 +466,52 @@ app.delete("/api/events/:id", async (req, res) => {
 });
 
 app.put('/api/events/:id', upload.single('poster'), async (req, res) => {
+  const { id } = req.params;
+  const {
+    name,
+    description,
+    date,
+    startTime,
+    endTime,
+    venue,
+    club,
+    department,
+    status,
+    managers,
+    volunteers,
+  } = req.body;
+
+  const updateData = {
+    name,
+    description,
+    date,
+    startTime,
+    endTime,
+    venue,
+    club,
+    department,
+    status,
+  };
+
   try {
-    const { id } = req.params;
-
-    // Debugging: Log the entire request body and any file data coming in
-    console.log("Request Body:", req.body); // This logs the form data sent in the request (excluding files)
-    console.log("Request File:", req.file); // This logs the file data (if any)
-
-    const {
-      name,
-      description,
-      date,
-      startTime,
-      endTime,
-      venue,
-      club,
-      department,
-      status,
-      managers,
-      volunteers,
-    } = req.body;
-
-    // Debugging: Log the managers and volunteers fields to see their raw form
-    console.log("Managers Field:", managers);
-    console.log("Volunteers Field:", volunteers);
-
-    // Parse and log managers and volunteers (if they are strings, convert them to arrays)
-    if (managers) {
-      try {
-        const parsedManagers = JSON.parse(managers);
-        console.log("Parsed Managers:", parsedManagers);
-      } catch (error) {
-        console.log("Error parsing managers:", error);
-      }
-    }
-
-    if (volunteers) {
-      try {
-        const parsedVolunteers = JSON.parse(volunteers);
-        console.log("Parsed Volunteers:", parsedVolunteers);
-      } catch (error) {
-        console.log("Error parsing volunteers:", error);
-      }
-    }
-
-    const updateData = {
-      name,
-      description,
-      date,
-      startTime,
-      endTime,
-      venue,
-      club,
-      department,
-      status,
-      managers: (managers || '[]'),
-      volunteers: (volunteers || '[]'),
-    };
-
-    if (req.file) {
-      updateData.poster = req.file.buffer.toString('base64');
-      updateData.posterContentType = req.file.mimetype;
-    }
-
-    const updatedEvent = await Event.findByIdAndUpdate(id, updateData, { new: true });
-
-    if (!updatedEvent) return res.status(404).json({ message: 'Event not found' });
-
-    res.json(updatedEvent);
+    updateData.managers = managers ? JSON.parse(managers) : [];
+    updateData.volunteers = volunteers ? JSON.parse(volunteers) : [];
   } catch (err) {
-    console.error('Error updating event:', err);
+    console.error('JSON parse error:', err);
+    return res.status(400).json({ message: 'Invalid JSON in managers/volunteers' });
+  }
+
+  if (req.file) {
+    updateData.poster = req.file.buffer.toString('base64');
+    updateData.posterContentType = req.file.mimetype;
+  }
+
+  try {
+    const updated = await Event.findByIdAndUpdate(id, updateData, { new: true });
+    if (!updated) return res.status(404).json({ message: 'Event not found' });
+    res.status(200).json(updated);
+  } catch (error) {
+    console.error('Update error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
