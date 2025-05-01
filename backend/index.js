@@ -10,6 +10,13 @@ import User from "./models/users.js";
 import Event from "./models/events.js";
 import Registration from './models/registrations.js';
 
+import multer from 'multer';
+import fs from 'fs';
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+
+
 const app = express();
 app.use(cors({
     origin: ['http://localhost:3000','https://eveosmania.vercel.app'],
@@ -447,7 +454,7 @@ app.get("/api/events", async (req, res) => {
     res.status(500).json({ message: "Error fetching events" });
   }
 });
-
+//--------events fetched used in eventdetails and event edit
 // Delete event by ID
 app.delete("/api/events/:id", async (req, res) => {
   try {
@@ -458,14 +465,82 @@ app.delete("/api/events/:id", async (req, res) => {
   }
 });
 
-app.put("/api/events/:id", async (req, res) => {
+app.put('/api/events/:id', upload.single('poster'), async (req, res) => {
   try {
-    const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(event);
+    const { id } = req.params;
+
+    // Debugging: Log the entire request body and any file data coming in
+    console.log("Request Body:", req.body); // This logs the form data sent in the request (excluding files)
+    console.log("Request File:", req.file); // This logs the file data (if any)
+
+    const {
+      name,
+      description,
+      date,
+      startTime,
+      endTime,
+      venue,
+      club,
+      department,
+      status,
+      managers,
+      volunteers,
+    } = req.body;
+
+    // Debugging: Log the managers and volunteers fields to see their raw form
+    console.log("Managers Field:", managers);
+    console.log("Volunteers Field:", volunteers);
+
+    // Parse and log managers and volunteers (if they are strings, convert them to arrays)
+    if (managers) {
+      try {
+        const parsedManagers = JSON.parse(managers);
+        console.log("Parsed Managers:", parsedManagers);
+      } catch (error) {
+        console.log("Error parsing managers:", error);
+      }
+    }
+
+    if (volunteers) {
+      try {
+        const parsedVolunteers = JSON.parse(volunteers);
+        console.log("Parsed Volunteers:", parsedVolunteers);
+      } catch (error) {
+        console.log("Error parsing volunteers:", error);
+      }
+    }
+
+    const updateData = {
+      name,
+      description,
+      date,
+      startTime,
+      endTime,
+      venue,
+      club,
+      department,
+      status,
+      managers: (managers || '[]'),
+      volunteers: (volunteers || '[]'),
+    };
+
+    if (req.file) {
+      updateData.poster = req.file.buffer.toString('base64');
+      updateData.posterContentType = req.file.mimetype;
+    }
+
+    const updatedEvent = await Event.findByIdAndUpdate(id, updateData, { new: true });
+
+    if (!updatedEvent) return res.status(404).json({ message: 'Event not found' });
+
+    res.json(updatedEvent);
   } catch (err) {
-    res.status(500).json({ message: "Error updating event" });
+    console.error('Error updating event:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
+
+
 
 app.get("/api/events/:id", async (req, res) => {
   try {
@@ -486,7 +561,7 @@ app.get("/api/events/:id", async (req, res) => {
   }
 });
 
-
+//----------------------
 
 app.get('/api/users/managers', async (req, res) => {
   try {
@@ -693,6 +768,38 @@ app.get('/api/all-registered-events/:userId', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch all registered events' });
   }
 });
+
+//--------------create event
+
+// ✅ API to create event
+const handleSubmit = async () => {
+  try {
+    const eventData = {
+      name,
+      description,
+      date,
+      startTime,
+      endTime,
+      venue,
+      club,
+      department,
+      status,
+      posterBase64,
+      posterContentType,
+      managers,
+      volunteers
+    };
+
+    console.log("Sending event:", eventData); // ✅ Log to confirm what's sent
+
+    const response = await axios.post('http://localhost:3001/api/events', eventData);
+    alert("Event created successfully");
+  } catch (error) {
+    console.error("Error creating event:", error);
+    alert("Error creating event");
+  }
+};
+
 
 
 app.listen(3001, () => {

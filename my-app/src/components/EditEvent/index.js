@@ -8,6 +8,7 @@ const EditEvent = () => {
   const navigate = useNavigate();
 
   const [event, setEvent] = useState({});
+  const [poster, setPoster] = useState(null);
   const [managers, setManagers] = useState([]);
   const [volunteers, setVolunteers] = useState([]);
   const [managerSearchResults, setManagerSearchResults] = useState([]);
@@ -28,6 +29,7 @@ const EditEvent = () => {
       setLoading(true);
       try {
         const res = await axios.get(`http://localhost:3001/api/events/${id}`);
+        console.log('Fetched event data:', res.data); // Debugging
         setEvent({
           ...res.data,
           date: res.data.date ? new Date(res.data.date).toISOString().split('T')[0] : '',
@@ -49,10 +51,17 @@ const EditEvent = () => {
     setEvent({ ...event, [e.target.name]: e.target.value });
   };
 
+  const handlePosterChange = (e) => {
+    const file = e.target.files[0];
+    console.log('Poster file selected:', file); // Debugging
+    setPoster(file);
+  };
+
   const searchManagers = async (query) => {
     if (!query) return;
     try {
       const res = await axios.get(`http://localhost:3001/api/users/managers?search=${query}`);
+      console.log('Managers search results:', res.data); // Debugging
       setManagerSearchResults(res.data);
     } catch (err) {
       console.error('Failed to search managers:', err);
@@ -63,6 +72,7 @@ const EditEvent = () => {
     if (!query) return;
     try {
       const res = await axios.get(`http://localhost:3001/api/users/volunteers?search=${query}`);
+      console.log('Volunteers search results:', res.data); // Debugging
       setVolunteerSearchResults(res.data);
     } catch (err) {
       console.error('Failed to search volunteers:', err);
@@ -81,32 +91,6 @@ const EditEvent = () => {
     }
   };
 
-  const uploadPoster = async (file) => {
-    if (!file) return;
-    const formData = new FormData();
-    formData.append('poster', file);
-
-    try {
-      const res = await axios.post('http://localhost:3001/api/upload-poster', formData);
-      setEvent((prev) => ({ ...prev, posterFileId: res.data.fileId }));
-      alert('Poster uploaded successfully!');
-    } catch (err) {
-      console.error('Poster upload failed:', err);
-      alert('Poster upload failed.');
-    }
-  };
-
-  const removePoster = async () => {
-    try {
-      await axios.delete(`http://localhost:3001/api/remove-poster/${event.posterFileId}`);
-      setEvent((prev) => ({ ...prev, posterFileId: null }));
-      alert('Poster removed successfully!');
-    } catch (err) {
-      console.error('Failed to remove poster:', err);
-      alert('Failed to remove poster.');
-    }
-  };
-
   const removeManager = (id) => {
     setManagers(managers.filter((m) => m._id !== id));
   };
@@ -118,11 +102,27 @@ const EditEvent = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      await axios.put(`http://localhost:3001/api/events/${id}`, {
-        ...event,
-        managers,
-        volunteers,
+      const formData = new FormData();
+      Object.entries(event).forEach(([key, value]) => formData.append(key, value));
+  
+      // Append the poster if selected
+      if (poster) formData.append('poster', poster);
+  
+      // Ensure managers and volunteers are arrays of ObjectId strings, not objects
+      const managerIds = managers.map(manager => manager._id ? manager._id : manager);
+      const volunteerIds = volunteers.map(volunteer => volunteer._id ? volunteer._id : volunteer);
+  
+      // Append the manager and volunteer IDs
+      formData.append('managers', JSON.stringify(managerIds));
+      formData.append('volunteers', JSON.stringify(volunteerIds));
+  
+      // Make the PUT request to update the event
+      await axios.put(`http://localhost:3001/api/events/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
+  
       alert('Event updated successfully!');
       navigate('/dashboard');
     } catch (err) {
@@ -132,6 +132,7 @@ const EditEvent = () => {
       setLoading(false);
     }
   };
+  
 
   if (loading) return <div className="loading">Loading...</div>;
 
@@ -147,33 +148,23 @@ const EditEvent = () => {
       <input name="club" value={event.club || ''} onChange={handleChange} placeholder="Club" />
       <input name="department" value={event.department || ''} onChange={handleChange} placeholder="Department" />
       <input name="status" value={event.status || ''} onChange={handleChange} placeholder="Status" />
-      
       <h3>Poster</h3>
-      {event.posterFileId ? (
-        <div>
-          <img
-            src={`http://localhost:3001/api/poster/${event.posterFileId}`}
-            alt="Poster Preview"
-            style={{ width: '200px', marginTop: '10px' }}
-          />
-          <button onClick={removePoster}>Remove Poster</button>
-        </div>
-      ) : (
-        <input type="file" name="poster" accept="image/*" onChange={(e) => uploadPoster(e.target.files[0])} />
+      {event._id && event.poster && event.posterContentType && (
+        <img
+          src={`data:${event.posterContentType};base64,${event.poster}`}
+          alt="Poster"
+          style={{ maxWidth: '200px' }}
+        />
       )}
-
+      <input type="file" accept="image/*" onChange={handlePosterChange} />
       <h3>Managers</h3>
       <div className="tag-container">
-        {managers.length > 0 ? (
-          managers.map((m) => (
-            <div key={m._id} className="tag">
-              {m.name}
-              <button onClick={() => removeManager(m._id)}>✕</button>
-            </div>
-          ))
-        ) : (
-          <p>No managers assigned yet.</p>
-        )}
+        {managers.map((m) => (
+          <div key={m._id} className="tag">
+            {m.name}
+            <button onClick={() => removeManager(m._id)}>✕</button>
+          </div>
+        ))}
       </div>
       <input type="text" placeholder="Search Managers" onChange={(e) => searchManagers(e.target.value)} />
       <div className="search-results">
@@ -184,19 +175,14 @@ const EditEvent = () => {
           </div>
         ))}
       </div>
-
       <h3>Volunteers</h3>
       <div className="tag-container">
-        {volunteers.length > 0 ? (
-          volunteers.map((v) => (
-            <div key={v._id} className="tag">
-              {v.name}
-              <button onClick={() => removeVolunteer(v._id)}>✕</button>
-            </div>
-          ))
-        ) : (
-          <p>No volunteers assigned yet.</p>
-        )}
+        {volunteers.map((v) => (
+          <div key={v._id} className="tag">
+            {v.name}
+            <button onClick={() => removeVolunteer(v._id)}>✕</button>
+          </div>
+        ))}
       </div>
       <input type="text" placeholder="Search Volunteers" onChange={(e) => searchVolunteers(e.target.value)} />
       <div className="search-results">
@@ -207,7 +193,6 @@ const EditEvent = () => {
           </div>
         ))}
       </div>
-
       <button className="save-btn" onClick={handleSave} disabled={loading}>Save</button>
     </div>
   );

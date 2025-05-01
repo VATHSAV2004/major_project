@@ -16,6 +16,7 @@ import Approval from "./components/Approval";     // Adjust path as needed
 import UserDashboard from "./components/UserDashboard"
 import AllRegisteredEvents from './components/AllRegisteredEvents';
 import About from './components/About';
+import AddEvent from './components/AddEvent';
 
 
 function App() {
@@ -55,6 +56,8 @@ function App() {
         <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/all-registered-events" element={<AllRegisteredEvents />} />
         <Route path="/about" element={<About />} />
+        <Route path="/add-event" element={<AddEvent />} />
+
 
         <Route path="*" element={<Navigate to="/" />} />
 
